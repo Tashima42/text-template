@@ -1,0 +1,28 @@
+.App {
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+.text-editor {
+  width: 100vw;
+  height: 90vh;
+  display: flex;
+}
+
+.text-editor .text-area {
+  width: 50vw;
+  height: 90vh;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.autocomplete {
+  margin-bottom: 10px;
+}
+
+.form-select {
+  width: 200px;
+  height: 100px;
+}
