@@ -18,11 +18,22 @@
   padding: 5px;
 }
 
-.autocomplete {
+.select {
   margin-bottom: 10px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  width: 45vw;
 }
 
 .form-select {
   width: 200px;
   height: 100px;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
 }

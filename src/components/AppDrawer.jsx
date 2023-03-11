@@ -19,7 +19,7 @@ export default function AppDrawer(props) {
                 <ListItemIcon>
                   <TextSnippet />
                 </ListItemIcon>
-                <ListItemText primary="Editor de texto" />
+                <ListItemText primary="Editor de select" />
               </ListItemButton>
             </ListItem>
             <ListItem>

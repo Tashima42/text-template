@@ -2,7 +2,15 @@ import * as React from 'react'
 import './App.css'
 import AppDrawer from './components/AppDrawer'
 import AppBar from "./components/AppBar"
-import {Autocomplete, TextField, Box, Select, MenuItem} from "@mui/material"
+import {
+  Autocomplete, 
+  TextField, 
+  Box, 
+  Select, 
+  MenuItem, 
+  FormControl,
+  InputLabel,
+} from "@mui/material"
 import forms from "./assets/forms"
 
 function App() {
@@ -12,14 +20,14 @@ function App() {
 
   const templatesKeys = Object.keys(forms)
   const [currentForm, setCurrentForm] = React.useState(templatesKeys[0])
-  const [baseText, setBaseText] = React.useState(forms[currentForm].textoBase)
+  const [baseText, setBaseText] = React.useState(forms[currentForm].baseText)
   const [finalText, setFinalText] = React.useState(baseText)
   const [templateValues, setTemplateValues] = React.useState([])
 
-  React.useEffect(() => {
-    setTemplateValues([])
-    setBaseText(forms[currentForm].textoBase)
-  }, [currentForm])
+  // React.useEffect(() => {
+  //   setTemplateValues([])
+  //   setBaseText(forms[currentForm].baseText)
+  // }, [currentForm])
 
   React.useEffect(() => {
     setFinalText(baseText)
@@ -44,14 +52,13 @@ function App() {
     </Select>
   )
 
-
   return (
     <div className="App">
       <AppBar title={title} toggleDrawer={toggleDrawer} templateSelect={templateSelect}/>
       <AppDrawer drawerState={drawerState} toggleDrawer={toggleDrawer}/> 
       <div className='text-editor'>
         <textarea readOnly={true} className='text-area' value={finalText}></textarea>
-        <Box style={{maxHeight: '90vh', overflow: 'auto'}}>
+        <Box style={{maxHeight: '90vh'}} className="box">
           {createForm()}
         </Box>
       </div>
@@ -64,36 +71,59 @@ function App() {
   }
 
   function createForm() {
-    const createdForms = forms[currentForm].opcoes.map((form, index) => {
-      if (form.tipo === "multiplos-textos") {
-        return form.valores.map((_, i) => {
-          const id = `${index + 1}.${i + 1}`
-          const label = form.legenda ? `${id} - ${form.legenda}` : id
-          return <Autocomplete
-            className="autocomplete"
-            id={id}
-            options={form.valores}
-            sx={{width: 700}}
-            renderInput={(params) => <TextField {...params} label={label} />}
-            key={id}
-            onChange={handleFormValuesChange}
-          />
-        })
-      } else if (form.tipo === "texto") {
+    const createdForms = forms[currentForm].options.map((form, index) => {
+      switch (form.type) {
+      case "select": {
         const id = String(index + 1)
-        const label = form.legenda ? `${id} - ${form.legenda}` : id
-        return <Autocomplete
-          className="autocomplete"
-          id={id}
-          options={form.valores}
-          sx={{width: 700}}
-          renderInput={(params) => <TextField {...params} label={label} />}
-          key={id}
-          onChange={handleFormValuesChange}
-        />
-      } else if (form.tipo === "texto-input") {
+        const label = form.label ? `${id} - ${form.label}` : id
+        return (
+          <FormControl key={id} sx={{ m: 1, minWidth: 240 }} className="select">
+            <InputLabel id={label}>{label}</InputLabel>
+            <Select
+              labelId={label}
+              label={label}
+              id={id}
+              key={id}
+              value={templateValues[id] ?? ""}
+              placeholder={label}
+              onChange={handleFormValuesChange(id)}
+            >
+              <MenuItem value={null}><em>Selecione uma opção</em></MenuItem>
+              {form.values.map((value, i) => {
+                return <MenuItem key={i} value={value}>{value}</MenuItem>
+              })}  
+              </Select>
+            </FormControl>
+          )
+      }
+      case "multi-select": {
+        const id = String(index + 1)
+        const label = form.label ? `${id} - ${form.label}` : id
+        return (
+          <FormControl key={id} sx={{ m: 1, minWidth: 240 }} className="select">
+            <InputLabel id={label}>{label}</InputLabel>
+            <Select
+              labelId={label}
+              label={label}
+              id={id}
+              key={id}
+              value={templateValues[id] ?? ""}
+              placeholder={label}
+              renderValue={(selected) => selected.join(', ')}
+              onChange={handleFormValuesChange(id)}
+            >
+              {form.values.map((value, i) => {
+                return <MenuItem key={i} value={value}>{value}
+                  <Checkbox checked={personName.indexOf(name) > -1} />
+                </MenuItem>
+              })}  
+              </Select>
+            </FormControl>
+          )
+      }
+      case "input": {
         const id = String((index + 1) + "-option")
-        const label = form.legenda ? `${index + 1} - ${form.legenda}` : id
+        const label = form.label ? `${index + 1} - ${form.label}` : id
         return <TextField
           id={id}
           key={id}
@@ -103,7 +133,10 @@ function App() {
           onChange={handleFormValuesChange}
         />
       }
-      return (<div></div>)
+      default: {
+        return (<div></div>)
+      }
+    }
     })
     return (
       <form>
@@ -112,22 +145,23 @@ function App() {
     )
   }
 
-  function handleFormValuesChange(event, value) {
-    if (!value) {
-      value = event.target.value
-      if (!value) return
-    }
-    const id = event.target.id
-    const index = id.split('-')[0]
-    // Handle Itens with multiple valid options
-    const multipleItensIndex = index.split(".")
-    if (multipleItensIndex && multipleItensIndex.length > 1) {
-      if (!templateValues[multipleItensIndex[0]]) templateValues[multipleItensIndex[0]] = []
-      templateValues[multipleItensIndex[0]][multipleItensIndex[1]] = value
-    } else templateValues[index] = value
+  function handleFormValuesChange(id) {
+    return function (event) {
+      let value = event.target.value
+      // Handle Itens with multiple valid options
+      const multipleItensIndex = id.split(".")
+      if (multipleItensIndex && multipleItensIndex.length > 1) {
+        if (!templateValues[multipleItensIndex[0]]) templateValues[multipleItensIndex[0]] = []
+        templateValues[multipleItensIndex[0]][multipleItensIndex[1]] = value
+      } else {
+        console.log("else")
+        templateValues[id] = value
+        console.log("index: ", id, templateValues[id])
+      }
 
-    setTemplateValues(templateValues)
-    updateFinalText()
+      setTemplateValues(templateValues)
+      updateFinalText()
+    }
   }
   function updateFinalText() {
     let text = baseText
@@ -140,7 +174,13 @@ function App() {
         })
         templateValue = multipleItens
       }
-      text = text.replace(`{{${index}}}`, templateValue)
+      console.log("templateValue first: ", templateValue)
+      if (templateValue === "" || templateValue === undefined || templateValue === null) {
+        console.log("templateValue: ", templateValue)
+        templateValue = `{{${index}}}`
+      } else {
+        text = text.replace(`{{${index}}}`, templateValue)
+      }       
     })
     setFinalText(text)
   }
