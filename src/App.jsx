@@ -178,9 +178,6 @@ function App(props) {
               />
             );
           }
-          default: {
-            return <div></div>;
-          }
         }
       }
     );

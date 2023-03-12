@@ -46,15 +46,15 @@ function TemplateEditor(props) {
             {createForm()}
             <div className="editor-buttons">
               <Button
-                className="editor-button"
+                className="editor-button eb"
                 variant="contained"
                 onClick={addTemplateVariable}
               >
                 Adicionar Variavel
               </Button>
-              <Button className="create-button" variant="contained" onClick={() => newTemplateModalHandle(true)}>Criar novo template</Button>
-              <Button className="apply-button" variant="contained" onClick={applyCurrentEditorTemplate}>Aplicar template sendo editado</Button>
-              <Button className="edit-button" variant="contained" onClick={editCurrentTemplate}>Editar template carregado</Button>
+              <Button className="create-button eb" variant="contained" onClick={() => newTemplateModalHandle(true)}>Criar novo template</Button>
+              <Button className="apply-button eb" variant="contained" onClick={applyCurrentEditorTemplate}>Aplicar template sendo editado</Button>
+              <Button className="edit-button eb" variant="contained" onClick={editCurrentTemplate}>Editar template carregado</Button>
             </div>
           </Box>
         </div>
@@ -103,15 +103,14 @@ function TemplateEditor(props) {
     console.log(event);
     setEditorBaseText(event.target.value);
     const variablesCount = countVariablesInText(event.target.value);
-    if (variablesCount != editorTemplates[editorCurrentTemplate].options.length) {
-      for (
-        let i = editorTemplates[editorCurrentTemplate].options.length;
-        i < variablesCount;
-        i++
-      ) {
-        editorTemplates[editorCurrentTemplate].options.push(null);
+      for (let i = 0; i < variablesCount; i++) {
+        const op = editorTemplates[editorCurrentTemplate].options[i];
+        if (typeof op !== "object") {
+          editorTemplates[editorCurrentTemplate].options.push({type: "tbd", label: ""});
+        }
       }
-    }
+      setEditorTemplates(editorTemplates);
+      console.log(editorTemplates)
   }
 
   function countVariablesInText(text) {
@@ -125,21 +124,32 @@ function TemplateEditor(props) {
   function createForm() {
     const createdForms = editorTemplates[editorCurrentTemplate].options.map(
       (option, index) => {
-        switch (option) {
-          case null:
+        switch (option.type) {
+        case "tbd": {
+          const id = String(index + 1);
+          return (
+            <FormControl key={id} sx={{ m: 1, minWidth: 120 }}>
+              <InputLabel id={`select-new-label-${id}`}>
+                Tipo da variavel {id}
+              </InputLabel>
+              <Select labelId={`select-new-label-${id}`} id={`select-${id}`}>
+                <MenuItem value="select">Selecionar</MenuItem>
+                <MenuItem value="multi-select">Multiplas Opções</MenuItem>
+                <MenuItem value="input">Texto</MenuItem>
+              </Select>
+            </FormControl>
+          );
+        }
+        case "select": {
             const id = String(index + 1);
             return (
               <FormControl key={id} sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id={`select-label-${id}`}>
-                  Tipo da variavel{id}
+                <InputLabel id={`select-editor-label-${id}`}>
+                  Valores
                 </InputLabel>
-                <Select labelId={`select-label-${id}`} id={`select-${id}`}>
-                  <MenuItem value="select">Selecionar</MenuItem>
-                  <MenuItem value="multi-select">Multiplas Opções</MenuItem>
-                  <MenuItem value="input">Texto</MenuItem>
-                </Select>
               </FormControl>
-            );
+            )
+          }
         }
       }
     );
