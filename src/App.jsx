@@ -3,35 +3,50 @@ import './App.css'
 import AppDrawer from './components/AppDrawer'
 import AppBar from "./components/AppBar"
 import {
-  Autocomplete, 
   TextField, 
   Box, 
   Select, 
   MenuItem, 
   FormControl,
   InputLabel,
+  Checkbox,
+  ListItemText,
+  Button
 } from "@mui/material"
-import forms from "./assets/forms"
+import buildTemplatesRepository from "./repositoy"
+
+const templatesRepository = buildTemplatesRepository()
 
 function App() {
   const drawerState = React.useState(false)
   const [drawer, setDrawer] = drawerState
   const [title, setTitle] = React.useState("Editor de templates")
 
-  const templatesKeys = Object.keys(forms)
-  const [currentForm, setCurrentForm] = React.useState(templatesKeys[0])
-  const [baseText, setBaseText] = React.useState(forms[currentForm].baseText)
+  const [templates, setTemplates] = React.useState(
+    templatesRepository.getTemplateFile("default")
+  )
+  const [templatesKeys ,setTemplatesKeys] = React.useState(
+    templates != null ? Object.keys(templates) : []
+  )
+
+  const [currentTemplate, setCurrentTemplate] = React.useState(
+    templatesKeys.length > 0 ? templatesKeys[0] : []
+  )
+  const [baseText, setBaseText] = React.useState(
+    templatesKeys.length > 0 ? templates[currentTemplate].baseText : ""
+  )
   const [finalText, setFinalText] = React.useState(baseText)
   const [templateValues, setTemplateValues] = React.useState([])
-
-  // React.useEffect(() => {
-  //   setTemplateValues([])
-  //   setBaseText(forms[currentForm].baseText)
-  // }, [currentForm])
+  const [restoreTemplateValues, setRestoreTemplateValues] = React.useState(true)
 
   React.useEffect(() => {
-    setFinalText(baseText)
-  }, [baseText])
+    const savedTemplateValues = templatesRepository.getTemplateValues(currentTemplate)
+    if (savedTemplateValues) {
+      setTemplateValues(savedTemplateValues)
+      updateFinalText("useEffect")
+      setRestoreTemplateValues(false)
+    }
+  }, [currentTemplate, restoreTemplateValues])
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -46,7 +61,7 @@ function App() {
       label="Templates"
       id="template-select"
       onChange={selectCurrentForm}
-      value={currentForm}
+      value={currentTemplate}
     >
     {templatesKeys.map((key) => <MenuItem key={key} value={key}>{key}</MenuItem>)}  
     </Select>
@@ -56,26 +71,51 @@ function App() {
     <div className="App">
       <AppBar title={title} toggleDrawer={toggleDrawer} templateSelect={templateSelect}/>
       <AppDrawer drawerState={drawerState} toggleDrawer={toggleDrawer}/> 
-      <div className='text-editor'>
-        <textarea readOnly={true} className='text-area' value={finalText}></textarea>
-        <Box style={{maxHeight: '90vh'}} className="box">
-          {createForm()}
-        </Box>
-      </div>
+      {
+        (templates != null && templates[currentTemplate] != null) && (
+          <div className='text-editor'>
+            <textarea readOnly={true} className='text-area' value={finalText}></textarea>
+            <Box style={{maxHeight: '90vh'}} className="box">
+              {createForm()}
+              <Button className="form-button" variant="contained" onClick={resetTemplateForm}>Resetar campos</Button>
+              <Button className="form-button" variant="contained" onClick={recoverTemplateForm}>Resgatar campos resetados</Button>
+            </Box>
+          </div>
+        )
+      }
     </div>
   )
 
   function selectCurrentForm({target: {value}}) {
     if (!value) return
-    setCurrentForm(value)
+    setCurrentTemplate(value)
+  }
+
+  function resetTemplateForm() {
+    const confirmReset = confirm("Tem certeza que deseja resetar os campos?")
+    if (confirmReset) {
+      templatesRepository.saveTemplateValues(`old-${currentTemplate}`, templateValues)
+      templatesRepository.saveTemplateValues(currentTemplate, [])
+      setTemplateValues([])
+      updateFinalText("resetTemplateForm")
+    }
+  }
+  function recoverTemplateForm() {
+    const savedTemplateValues = templatesRepository.getTemplateValues(`old-${currentTemplate}`)
+    console.log("saved: ", savedTemplateValues)
+    if (savedTemplateValues) {
+      templatesRepository.saveTemplateValues(currentTemplate, savedTemplateValues)
+      setTemplateValues(savedTemplateValues)
+      updateFinalText("recoverTemplateForm")
+    }
   }
 
   function createForm() {
-    const createdForms = forms[currentForm].options.map((form, index) => {
-      switch (form.type) {
+    const createdForms = templates[currentTemplate].options.map((option, index) => {
+      switch (option.type) {
       case "select": {
         const id = String(index + 1)
-        const label = form.label ? `${id} - ${form.label}` : id
+        const label = option.label ? `${id} - ${option.label}` : id
         return (
           <FormControl key={id} sx={{ m: 1, minWidth: 240 }} className="select">
             <InputLabel id={label}>{label}</InputLabel>
@@ -89,7 +129,7 @@ function App() {
               onChange={handleFormValuesChange(id)}
             >
               <MenuItem value={null}><em>Selecione uma opção</em></MenuItem>
-              {form.values.map((value, i) => {
+              {option.values.map((value, i) => {
                 return <MenuItem key={i} value={value}>{value}</MenuItem>
               })}  
               </Select>
@@ -98,7 +138,7 @@ function App() {
       }
       case "multi-select": {
         const id = String(index + 1)
-        const label = form.label ? `${id} - ${form.label}` : id
+        const label = option.label ? `${id} - ${option.label}` : id
         return (
           <FormControl key={id} sx={{ m: 1, minWidth: 240 }} className="select">
             <InputLabel id={label}>{label}</InputLabel>
@@ -107,14 +147,17 @@ function App() {
               label={label}
               id={id}
               key={id}
-              value={templateValues[id] ?? ""}
               placeholder={label}
-              renderValue={(selected) => selected.join(', ')}
+              value={""}
+              renderValue={() => ""}
               onChange={handleFormValuesChange(id)}
             >
-              {form.values.map((value, i) => {
-                return <MenuItem key={i} value={value}>{value}
-                  <Checkbox checked={personName.indexOf(name) > -1} />
+              {option.values.map((v, i) => {
+                const checked = Array.isArray(templateValues[id]) && templateValues[id].indexOf(v) > -1 
+                const value = `${i}|-|${v}`
+                return <MenuItem key={i} value={value}>
+                  <Checkbox checked={checked} />
+                  <ListItemText primary={v} />
                 </MenuItem>
               })}  
               </Select>
@@ -122,15 +165,16 @@ function App() {
           )
       }
       case "input": {
-        const id = String((index + 1) + "-option")
-        const label = form.label ? `${index + 1} - ${form.label}` : id
+        const id = String(index + 1)
+        const label = option.label ? `${index + 1} - ${option.label}` : id
         return <TextField
           id={id}
           key={id}
           className="text-input"
           label={label}
           variant="outlined"
-          onChange={handleFormValuesChange}
+          value={templateValues[id] ?? ""}
+          onChange={handleFormValuesChange(id)}
         />
       }
       default: {
@@ -140,43 +184,65 @@ function App() {
     })
     return (
       <form>
-        {createdForms}
+        <div className='template-form'>
+          {createdForms}
+        </div>
       </form>
     )
   }
 
   function handleFormValuesChange(id) {
     return function (event) {
-      let value = event.target.value
-      // Handle Itens with multiple valid options
-      const multipleItensIndex = id.split(".")
-      if (multipleItensIndex && multipleItensIndex.length > 1) {
-        if (!templateValues[multipleItensIndex[0]]) templateValues[multipleItensIndex[0]] = []
-        templateValues[multipleItensIndex[0]][multipleItensIndex[1]] = value
+      console.log(event)
+      let  { target: { value } } = event
+
+      if (value != null) {
+        const multiSplit = value.split("|-|")
+        if (multiSplit && multiSplit.length > 1) {
+          value = multiSplit[1]
+          let templateValueIndex = -1
+          if (Array.isArray(templateValues[id])) {
+            templateValueIndex = templateValues[id].indexOf(value)
+          }
+          if (templateValueIndex > -1) {
+            templateValues[id].splice(templateValueIndex, 1)
+          } else {
+            const multiSubIndex = multiSplit[0]
+            if (!templateValues[id]) {
+              templateValues[id] = []
+            }
+            templateValues[id][multiSubIndex] = value
+          }
+        } else {
+          templateValues[id] = value
+        }
       } else {
-        console.log("else")
-        templateValues[id] = value
-        console.log("index: ", id, templateValues[id])
+          templateValues[id] = value
       }
 
       setTemplateValues(templateValues)
-      updateFinalText()
+      templatesRepository.saveTemplateValues(currentTemplate, templateValues)
+      updateFinalText("handleFormValuesChange")
     }
   }
-  function updateFinalText() {
+  function updateFinalText(invokePlace) {
+    console.log("invokePlace: ", invokePlace)
     let text = baseText
     templateValues.forEach((templateValue, index) => {
-      // Handle itens with multiple valid options
       if (Array.isArray(templateValue)) {
         let multipleItens = ""
-        templateValue.forEach((item, i) => {
-          multipleItens = multipleItens + `${i}) ${item} `
+        const multiValues = [] 
+        templateValue.forEach((v) => {
+          if (v != null && v !== "" && v !== undefined) {
+            multiValues.push(v)
+          }
+        })
+        multiValues.forEach((item, i) => {
+          multipleItens = multipleItens + `${i + 1}) ${item} `
         })
         templateValue = multipleItens
       }
-      console.log("templateValue first: ", templateValue)
       if (templateValue === "" || templateValue === undefined || templateValue === null) {
-        console.log("templateValue: ", templateValue)
         templateValue = `{{${index}}}`
       } else {
         text = text.replace(`{{${index}}}`, templateValue)

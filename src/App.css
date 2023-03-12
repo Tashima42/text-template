@@ -22,10 +22,11 @@
   margin-bottom: 10px;
 }
 
-form {
+.template-form {
   display: flex;
   flex-direction: column;
   width: 45vw;
+  padding: 10px;
 }
 
 .form-select {
