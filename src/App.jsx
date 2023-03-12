@@ -143,7 +143,8 @@ function App(props) {
                   id={id}
                   key={id}
                   placeholder={label}
-                  value={""}
+                  value={templateValues[id] ?? []}
+                  multiple
                   renderValue={() => ""}
                   onChange={handleFormValuesChange(id)}
                 >
@@ -151,9 +152,8 @@ function App(props) {
                     const checked =
                       Array.isArray(templateValues[id]) &&
                       templateValues[id].indexOf(v) > -1;
-                    const value = `${i}|-|${v}`;
                     return (
-                      <MenuItem key={i} value={value}>
+                      <MenuItem key={i} value={v}>
                         <Checkbox checked={checked} />
                         <ListItemText primary={v} />
                       </MenuItem>
@@ -175,6 +175,7 @@ function App(props) {
                 variant="outlined"
                 value={templateValues[id] ?? ""}
                 onChange={handleFormValuesChange(id)}
+                sx={{ m: 1, minWidth: 240 }}
               />
             );
           }
@@ -195,29 +196,31 @@ function App(props) {
         target: { value },
       } = event;
 
-      if (value != null) {
-        const multiSplit = value.split("|-|");
-        if (multiSplit && multiSplit.length > 1) {
-          value = multiSplit[1];
-          let templateValueIndex = -1;
-          if (Array.isArray(templateValues[id])) {
-            templateValueIndex = templateValues[id].indexOf(value);
-          }
-          if (templateValueIndex > -1) {
-            templateValues[id].splice(templateValueIndex, 1);
-          } else {
-            const multiSubIndex = multiSplit[0];
-            if (!templateValues[id]) {
-              templateValues[id] = [];
-            }
-            templateValues[id][multiSubIndex] = value;
-          }
-        } else {
-          templateValues[id] = value;
-        }
-      } else {
-        templateValues[id] = value;
-      }
+      // if (value != null) {
+      //   const multiSplit = value.split("|-|");
+      //   if (multiSplit && multiSplit.length > 1) {
+      //     value = multiSplit[1];
+      //     let templateValueIndex = -1;
+      //     if (Array.isArray(templateValues[id])) {
+      //       templateValueIndex = templateValues[id].indexOf(value);
+      //     }
+      //     if (templateValueIndex > -1) {
+      //       templateValues[id].splice(templateValueIndex, 1);
+      //     } else {
+      //       const multiSubIndex = multiSplit[0];
+      //       if (!templateValues[id]) {
+      //         templateValues[id] = [];
+      //       }
+      //       templateValues[id][multiSubIndex] = value;
+      //     }
+      //   } else {
+      //     templateValues[id] = value;
+      //   }
+      // } else {
+      //   templateValues[id] = value;
+      // }
+
+      templateValues[id] = value;
 
       setTemplateValues(templateValues);
       templatesRepository.saveTemplateValues(currentTemplate, templateValues);
