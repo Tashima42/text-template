@@ -5,6 +5,8 @@ export default function templatesRepository() {
     saveTemplateFile,
     getTemplateFile,
     moveTemplateFile,
+    saveRoute,
+    getRoute,
     getForms,
     saveForms,
   })
@@ -18,7 +20,11 @@ export default function templatesRepository() {
   }
   function saveTemplateFile(templateKey, file) {
     const key = `template-file-${templateKey}`
-    set(key, file)
+    if (typeof file === 'string') {
+      set(key, file)
+    } else {
+      set(key, JSON.stringify(file))
+    }
   }
   function getTemplateFile(templateKey) {
     const key = `template-file-${templateKey}`
@@ -28,6 +34,12 @@ export default function templatesRepository() {
     const key = `template-file-used-${templateKey}`
     set(key, JSON.stringify(getTemplateFile(templateKey)))
     remove(templateKey)
+  }
+  function saveRoute(route) {
+    set('route', route)
+  }
+  function getRoute() {
+    return get('route')
   }
   function getForms() {
     return get('forms')

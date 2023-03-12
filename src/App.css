@@ -45,3 +45,10 @@
   display: flex;
   justify-content: space-evenly;
 }
+
+.new-template {
+  display: flex;
+  flex-direction: column;
+  width: 20vw;
+  align-self: center;
+}

@@ -20,7 +20,10 @@ export default function ButtonAppBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <div className="form-select-div">{props.templateSelect}</div>
+          <div className="form-select-div">
+            {props.templateSelect}
+            {props.editorSelect}
+          </div>
         </Toolbar>
       </AppBar>
     </Box>

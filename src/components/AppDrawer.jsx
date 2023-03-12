@@ -26,11 +26,9 @@ export default function AppDrawer(props) {
 
   function handleTemplateEditorRoute() {
     setRoute("/template-editor");
-    handleOpen(false);
   }
   function handleTextEditorRoute() {
     setRoute("/");
-    handleOpen(false);
   }
 
   async function handleDownload() {

@@ -17,9 +17,12 @@ const templatesRepository = buildTemplatesRepository();
 function Main() {
   const drawerState = React.useState(false);
   const [drawer, setDrawer] = drawerState;
-  const routeState = React.useState("/");
-  const [route] = routeState;
+  const routeState = React.useState(
+    templatesRepository.getRoute() ?? "/"
+  );
+  const [route, setRoute] = routeState;
 
+  // TEXT EDITOR
   const templatesState = React.useState(
     templatesRepository.getTemplateFile("default")
   );
@@ -46,8 +49,24 @@ function Main() {
   const templateValuesState = React.useState([]);
   const [templateValues, setTemplateValues] = templateValuesState;
   const restoreTemplateValuesState = React.useState(true);
-  const [restoreTemplateValues, setRestoreTemplateValues] =
-    restoreTemplateValuesState;
+  const [restoreTemplateValues, setRestoreTemplateValues] = restoreTemplateValuesState;
+
+  // TEMPLATE EDITOR
+  const editorTemplatesState = React.useState(
+    templatesRepository.getTemplateFile("editor") || {}
+  );
+  const [editorTemplates] = editorTemplatesState;
+  const editorTemplatesKeysState = React.useState(
+    editorTemplates != null ? Object.keys(editorTemplates) : []
+  );
+  const [editorTemplatesKeys] = editorTemplatesKeysState;
+  const editorCurrentTemplateState = React.useState(
+    editorTemplatesKeys.length > 0 ? editorTemplatesKeys[0] : []
+  );
+  const [editorCurrentTemplate, setEditorCurrentTemplate] = editorCurrentTemplateState;
+  const editorBaseTextState = React.useState(
+    editorTemplatesKeys.length > 0 ? editorTemplates[editorCurrentTemplate].baseText : ""
+  );
 
   React.useEffect(() => {
     const savedTemplateValues =
@@ -57,7 +76,7 @@ function Main() {
       updateFinalText("useEffect");
       setRestoreTemplateValues(false);
     }
-  }, [currentTemplate, restoreTemplateValues]);
+  }, [currentTemplate, restoreTemplateValues, route]);
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -68,16 +87,20 @@ function Main() {
     }
     setDrawer(open);
   };
-  function selectCurrentForm({ target: { value } }) {
+  function selectCurrentTemplate({ target: { value } }) {
     if (!value) return;
     setCurrentTemplate(value);
+  }
+  function selectEditorTemplate({ target: { value } }) {
+    if (!value) return;
+    setEditorCurrentTemplate(value);
   }
   const templateSelect = (
     <Select
       labelId="templates-label"
       label="Templates"
       id="template-select"
-      onChange={selectCurrentForm}
+      onChange={selectCurrentTemplate}
       value={currentTemplate}
       variant="outlined"
       sx={{ color: "white", borderColor: "white" }}
@@ -89,6 +112,25 @@ function Main() {
       ))}
     </Select>
   );
+
+  const editorSelect = (
+    <Select
+      labelId="editor-label"
+      label="Editor"
+      id="editor-select"
+      onChange={selectEditorTemplate}
+      value={editorCurrentTemplate}
+      variant="outlined"
+      sx={{ color: "white", borderColor: "white" }}
+    >
+      {
+        editorTemplatesKeys.map((key) => (
+          <MenuItem key={key} value={key}>
+            {key}
+          </MenuItem>
+      ))}
+    </Select>
+  )
 
   function renderComponent() {
     switch (route) {
@@ -105,13 +147,11 @@ function Main() {
         );
       case "/template-editor":
         return (
-          <TemplateEditor
-            templatesState={templatesState}
-            currentTemplateState={currentTemplateState}
-            baseTextState={baseTextState}
-            finalTextState={finalTextState}
-            templateValuesState={templateValuesState}
-            updateFinalText={updateFinalText}
+          <TemplateEditor 
+            editorTemplatesState={editorTemplatesState}
+            editorTemplatesKeysState={editorTemplatesKeysState}
+            editorCurrentTemplateState={editorCurrentTemplateState}
+            editorBaseTextState={editorBaseTextState}
           />
         );
       default:
@@ -164,7 +204,7 @@ function Main() {
   }
   return (
     <>
-      <AppBar toggleDrawer={toggleDrawer} templateSelect={templateSelect} />
+      <AppBar toggleDrawer={toggleDrawer} templateSelect={templateSelect} editorSelect={editorSelect} />
       <AppDrawer
         drawerState={drawerState}
         toggleDrawer={toggleDrawer}

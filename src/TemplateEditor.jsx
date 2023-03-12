@@ -7,35 +7,39 @@ import {
   FormControl,
   InputLabel,
   Button,
+  TextField,
 } from "@mui/material";
+import NewTemplateModal from "./components/NewTemplateModal";
 import buildTemplatesRepository from "./repositoy";
 
 const templatesRepository = buildTemplatesRepository();
 
 function TemplateEditor(props) {
-  const [templates, setTemplates] = React.useState(
-    templatesRepository.getTemplateFile("editor")
-  );
-  const [templatesKeys, setTemplatesKeys] = React.useState(
-    templates != null ? Object.keys(templates) : []
-  );
-  const [currentTemplate, setCurrentTemplate] = React.useState(
-    templatesKeys.length > 0 ? templatesKeys[0] : []
-  );
-  const [baseText, setBaseText] = React.useState(
-    templatesKeys.length > 0 ? templates[currentTemplate].baseText : ""
-  );
-  const [finalText, setFinalText] = React.useState(baseText);
+  const {
+    editorTemplatesState,
+    editorTemplatesKeysState,
+    editorCurrentTemplateState,
+    editorBaseTextState,
+  } = props
+  const newTemplateModalState = React.useState(false);
+  const [newTemplateModal, setNewTemplateModal] = newTemplateModalState;
+  const [editorTemplates, setEditorTemplates] = editorTemplatesState;
+  const [editorTemplatesKeys, setEditorTemplatesKeys] = editorTemplatesKeysState;
+  const [editorCurrentTemplate, setEditorCurrentTemplate] = editorCurrentTemplateState;
+  const [editorBaseText, setEditorBaseText] = editorBaseTextState;
+  const [editorFinalText, setEditorFinalText] = React.useState(editorBaseText);
 
-  React.useEffect(() => {}, [templates, baseText]);
+  // React.useEffect(() => {}, [editorTemplates, editorBaseText]);
 
   return (
     <div className="App">
-      {templates != null && templates[currentTemplate] != null && (
+      <NewTemplateModal openState={newTemplateModalState} handleOpen={newTemplateModalHandle} editorTemplatesState={editorTemplatesState}/>
+      {(editorTemplates != null && editorTemplates[editorCurrentTemplate] != null) 
+      ? (
         <div className="text-editor">
           <textarea
             className="text-area"
-            value={baseText}
+            value={editorBaseText}
             onChange={handleTextChange}
           ></textarea>
           <Box style={{ maxHeight: "90vh" }} className="box">
@@ -48,35 +52,64 @@ function TemplateEditor(props) {
               >
                 Adicionar Variavel
               </Button>
+              <Button className="create-button" variant="contained" onClick={() => newTemplateModalHandle(true)}>Criar novo template</Button>
+              <Button className="apply-button" variant="contained" onClick={applyCurrentEditorTemplate}>Aplicar template sendo editado</Button>
+              <Button className="edit-button" variant="contained" onClick={editCurrentTemplate}>Editar template carregado</Button>
             </div>
           </Box>
         </div>
-      )}
+      )
+      : (
+        <div className="new-template">
+          <Button className="create-button" variant="contained" onClick={() => newTemplateModalHandle(true)}>Criar novo template</Button>
+          <Button className="edit-button" variant="contained" onClick={editCurrentTemplate}>Editar template carregado</Button>
+        </div>
+      )
+    }
     </div>
   );
 
+  function applyCurrentEditorTemplate() {
+    const currentAppliedTemplate = templatesRepository.getTemplateFile("default");
+    templatesRepository.saveTemplateFile("old", currentAppliedTemplate);
+    templatesRepository.saveTemplateFile("default", editorTemplates);
+    window.location.reload()
+  } 
+
+  function editCurrentTemplate() {
+    const currentAppliedTemplate = templatesRepository.getTemplateFile("default");
+    const currentEditorTemplate = templatesRepository.getTemplateFile("editor");
+    templatesRepository.saveTemplateFile("editor-old", currentEditorTemplate);
+    templatesRepository.saveTemplateFile("editor", currentAppliedTemplate);
+    window.location.reload()
+  }
+
+  function newTemplateModalHandle(openState) {
+    setNewTemplateModal(openState);
+  }
+
   function addTemplateVariable() {
-    templates[currentTemplate].baseText += ` {{${
-      templates[currentTemplate].options.length + 1
+    editorTemplates[editorCurrentTemplate].baseText += ` {{${
+      editorTemplates[editorCurrentTemplate].options.length + 1
     }}}`;
-    templates[currentTemplate].options.push(null);
-    setBaseText(templates[currentTemplate].baseText);
+    editorTemplates[editorCurrentTemplate].options.push(null);
+    setEditorBaseText(editorTemplates[editorCurrentTemplate].baseText);
     handleTextChange({
-      target: { value: templates[currentTemplate].baseText },
+      target: { value: editorTemplates[editorCurrentTemplate].baseText },
     });
   }
 
   function handleTextChange(event) {
     console.log(event);
-    setBaseText(event.target.value);
+    setEditorBaseText(event.target.value);
     const variablesCount = countVariablesInText(event.target.value);
-    if (variablesCount != templates[currentTemplate].options.length) {
+    if (variablesCount != editorTemplates[editorCurrentTemplate].options.length) {
       for (
-        let i = templates[currentTemplate].options.length;
+        let i = editorTemplates[editorCurrentTemplate].options.length;
         i < variablesCount;
         i++
       ) {
-        templates[currentTemplate].options.push(null);
+        editorTemplates[editorCurrentTemplate].options.push(null);
       }
     }
   }
@@ -90,7 +123,7 @@ function TemplateEditor(props) {
   }
 
   function createForm() {
-    const createdForms = templates[currentTemplate].options.map(
+    const createdForms = editorTemplates[editorCurrentTemplate].options.map(
       (option, index) => {
         switch (option) {
           case null:
