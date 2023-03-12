@@ -22,7 +22,7 @@ export default function ButtonAppBar(props) {
           </IconButton>
           <div className="form-select-div">
             {props.templateSelect}
-            {props.editorSelect}
+            {/* {props.editorSelect} */}
           </div>
         </Toolbar>
       </AppBar>

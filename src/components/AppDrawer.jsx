@@ -59,14 +59,14 @@ export default function AppDrawer(props) {
               <ListItemText primary="Editor de texto" />
             </ListItemButton>
           </ListItem>
-          <ListItem>
+          {/* <ListItem>
             <ListItemButton onClick={handleTemplateEditorRoute}>
               <ListItemIcon>
                 <AccountTree />
               </ListItemIcon>
               <ListItemText primary="Editor de template" />
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
           <ListItem>
             <ListItemButton onClick={() => handleOpen(true)}>
               <ListItemIcon>
