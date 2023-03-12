@@ -15,7 +15,14 @@ export default function AppDrawer(props) {
 
   function handleOpen(openState) {
     setOpen(openState)
-  } 
+  }
+
+  function handleTemplateEditorRoute() {
+    window.location.replace("/template-editor")
+  }
+  function handleTextEditorRoute() {
+    window.location.replace("/")
+  }
 
   async function handleDownload() {
     const json = JSON.stringify(templatesRepository.getTemplateFile("default"));
@@ -38,15 +45,19 @@ export default function AppDrawer(props) {
         >
           <List>
             <ListItem>
-              <ListItemButton>
+              <ListItemButton
+                onClick={handleTextEditorRoute}
+              >
                 <ListItemIcon>
                   <TextSnippet />
                 </ListItemIcon>
-                <ListItemText primary="Editor de select" />
+                <ListItemText primary="Editor de texto" />
               </ListItemButton>
             </ListItem>
             <ListItem>
-              <ListItemButton>
+              <ListItemButton
+                onClick={handleTemplateEditorRoute}
+              >
                 <ListItemIcon>
                   <AccountTree />
                 </ListItemIcon>

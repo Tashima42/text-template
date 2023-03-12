@@ -1,7 +1,5 @@
 import * as React from 'react'
 import './App.css'
-import AppDrawer from './components/AppDrawer'
-import AppBar from "./components/AppBar"
 import {
   TextField, 
   Box, 
@@ -17,68 +15,34 @@ import buildTemplatesRepository from "./repositoy"
 
 const templatesRepository = buildTemplatesRepository()
 
-function App() {
-  const drawerState = React.useState(false)
-  const [drawer, setDrawer] = drawerState
-  const [title, setTitle] = React.useState("Editor de templates")
+function App(props) {
+  const { 
+    templatesState,
+    currentTemplateState,
+    baseTextState,
+    finalTextState,
+    templateValuesState,
+    updateFinalText
+  } = props
 
-  const [templates, setTemplates] = React.useState(
-    templatesRepository.getTemplateFile("default")
-  )
-  const [templatesKeys ,setTemplatesKeys] = React.useState(
-    templates != null ? Object.keys(templates) : []
-  )
-
-  const [currentTemplate, setCurrentTemplate] = React.useState(
-    templatesKeys.length > 0 ? templatesKeys[0] : []
-  )
-  const [baseText, setBaseText] = React.useState(
-    templatesKeys.length > 0 ? templates[currentTemplate].baseText : ""
-  )
-  const [finalText, setFinalText] = React.useState(baseText)
-  const [templateValues, setTemplateValues] = React.useState([])
-  const [restoreTemplateValues, setRestoreTemplateValues] = React.useState(true)
-
-  React.useEffect(() => {
-    const savedTemplateValues = templatesRepository.getTemplateValues(currentTemplate)
-    if (savedTemplateValues) {
-      setTemplateValues(savedTemplateValues)
-      updateFinalText("useEffect")
-      setRestoreTemplateValues(false)
-    }
-  }, [currentTemplate, restoreTemplateValues])
-
-  const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-    setDrawer(open)
-  };
-
-  const templateSelect = (
-    <Select
-      labelId='templates-label'
-      label="Templates"
-      id="template-select"
-      onChange={selectCurrentForm}
-      value={currentTemplate}
-    >
-    {templatesKeys.map((key) => <MenuItem key={key} value={key}>{key}</MenuItem>)}  
-    </Select>
-  )
+  const [templates] = templatesState
+  const [currentTemplate] = currentTemplateState
+  const [baseText] = baseTextState
+  const [finalText, setFinalText] = finalTextState
+  const [templateValues, setTemplateValues] = templateValuesState
 
   return (
     <div className="App">
-      <AppBar title={title} toggleDrawer={toggleDrawer} templateSelect={templateSelect}/>
-      <AppDrawer drawerState={drawerState} toggleDrawer={toggleDrawer}/> 
       {
         (templates != null && templates[currentTemplate] != null) && (
           <div className='text-editor'>
             <textarea readOnly={true} className='text-area' value={finalText}></textarea>
             <Box style={{maxHeight: '90vh'}} className="box">
               {createForm()}
-              <Button className="form-button" variant="contained" onClick={resetTemplateForm}>Resetar campos</Button>
-              <Button className="form-button" variant="contained" onClick={recoverTemplateForm}>Resgatar campos resetados</Button>
+              <div className='form-buttons'>
+                <Button className="form-button" variant="contained" onClick={resetTemplateForm}>Resetar campos</Button>
+                <Button className="form-button" variant="contained" onClick={recoverTemplateForm}>Resgatar campos resetados</Button>
+              </div>
             </Box>
           </div>
         )
@@ -86,18 +50,13 @@ function App() {
     </div>
   )
 
-  function selectCurrentForm({target: {value}}) {
-    if (!value) return
-    setCurrentTemplate(value)
-  }
 
   function resetTemplateForm() {
     const confirmReset = confirm("Tem certeza que deseja resetar os campos?")
     if (confirmReset) {
       templatesRepository.saveTemplateValues(`old-${currentTemplate}`, templateValues)
       templatesRepository.saveTemplateValues(currentTemplate, [])
-      setTemplateValues([])
-      updateFinalText("resetTemplateForm")
+      updateFinalText("resetTemplateForm", [])
     }
   }
   function recoverTemplateForm() {
@@ -106,7 +65,7 @@ function App() {
     if (savedTemplateValues) {
       templatesRepository.saveTemplateValues(currentTemplate, savedTemplateValues)
       setTemplateValues(savedTemplateValues)
-      updateFinalText("recoverTemplateForm")
+      updateFinalText("recoverTemplateForm", savedTemplateValues)
     }
   }
 
@@ -224,31 +183,6 @@ function App() {
       templatesRepository.saveTemplateValues(currentTemplate, templateValues)
       updateFinalText("handleFormValuesChange")
     }
-  }
-  function updateFinalText(invokePlace) {
-    console.log("invokePlace: ", invokePlace)
-    let text = baseText
-    templateValues.forEach((templateValue, index) => {
-      if (Array.isArray(templateValue)) {
-        let multipleItens = ""
-        const multiValues = [] 
-        templateValue.forEach((v) => {
-          if (v != null && v !== "" && v !== undefined) {
-            multiValues.push(v)
-          }
-        })
-        multiValues.forEach((item, i) => {
-          multipleItens = multipleItens + `${i + 1}) ${item} `
-        })
-        templateValue = multipleItens
-      }
-      if (templateValue === "" || templateValue === undefined || templateValue === null) {
-        templateValue = `{{${index}}}`
-      } else {
-        text = text.replace(`{{${index}}}`, templateValue)
-      }       
-    })
-    setFinalText(text)
   }
 }
 
