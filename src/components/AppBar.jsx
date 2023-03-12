@@ -1,9 +1,9 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
 
 export default function ButtonAppBar(props) {
   return (
@@ -20,9 +20,7 @@ export default function ButtonAppBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <div className="form-select-div">
-            {props.templateSelect}
-          </div>
+          <div className="form-select-div">{props.templateSelect}</div>
         </Toolbar>
       </AppBar>
     </Box>
