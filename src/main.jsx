@@ -17,9 +17,7 @@ const templatesRepository = buildTemplatesRepository();
 function Main() {
   const drawerState = React.useState(false);
   const [drawer, setDrawer] = drawerState;
-  const routeState = React.useState(
-    templatesRepository.getRoute() ?? "/"
-  );
+  const routeState = React.useState(templatesRepository.getRoute() ?? "/");
   const [route, setRoute] = routeState;
 
   // TEXT EDITOR
@@ -46,10 +44,11 @@ function Main() {
   const finalTextState = React.useState(baseText);
   const [finalText, setFinalText] = finalTextState;
 
-  const templateValuesState = React.useState([]);
+  const templateValuesState = React.useState({});
   const [templateValues, setTemplateValues] = templateValuesState;
   const restoreTemplateValuesState = React.useState(true);
-  const [restoreTemplateValues, setRestoreTemplateValues] = restoreTemplateValuesState;
+  const [restoreTemplateValues, setRestoreTemplateValues] =
+    restoreTemplateValuesState;
 
   // TEMPLATE EDITOR
   const editorTemplatesState = React.useState(
@@ -63,18 +62,33 @@ function Main() {
   const editorCurrentTemplateState = React.useState(
     editorTemplatesKeys.length > 0 ? editorTemplatesKeys[0] : []
   );
-  const [editorCurrentTemplate, setEditorCurrentTemplate] = editorCurrentTemplateState;
+  const [editorCurrentTemplate, setEditorCurrentTemplate] =
+    editorCurrentTemplateState;
   const editorBaseTextState = React.useState(
-    editorTemplatesKeys.length > 0 ? editorTemplates[editorCurrentTemplate].baseText : ""
+    editorTemplatesKeys.length > 0
+      ? editorTemplates[editorCurrentTemplate].baseText
+      : ""
   );
 
   React.useEffect(() => {
-    const savedTemplateValues =
-      templatesRepository.getTemplateValues(currentTemplate);
-    if (savedTemplateValues) {
-      setTemplateValues(savedTemplateValues);
-      updateFinalText("useEffect");
-      setRestoreTemplateValues(false);
+    if (restoreTemplateValues) {
+      const savedTemplateValues =
+        templatesRepository.getTemplateValues("default");
+      if (savedTemplateValues) {
+        Object.keys(savedTemplateValues).forEach((key) => {
+          for (let i = 0; i < templates[key].options.length; i++) {
+            if (!savedTemplateValues[key][i]) {
+              savedTemplateValues[key][i] = null;
+            }
+          }
+        })
+        updateFinalText("useEffect", savedTemplateValues);
+        setRestoreTemplateValues(false);
+      }
+    }
+    const savedCurrentTemplate = templatesRepository.getCurrentTemplate();
+    if (savedCurrentTemplate) {
+      setCurrentTemplate(savedCurrentTemplate);
     }
   }, [currentTemplate, restoreTemplateValues, route]);
 
@@ -90,6 +104,8 @@ function Main() {
   function selectCurrentTemplate({ target: { value } }) {
     if (!value) return;
     setCurrentTemplate(value);
+    templatesRepository.saveCurrentTemplate(value);
+    updateFinalText("selectCurrentTemplate", templateValues);
   }
   function selectEditorTemplate({ target: { value } }) {
     if (!value) return;
@@ -123,14 +139,13 @@ function Main() {
       variant="outlined"
       sx={{ color: "white", borderColor: "white" }}
     >
-      {
-        editorTemplatesKeys.map((key) => (
-          <MenuItem key={key} value={key}>
-            {key}
-          </MenuItem>
+      {editorTemplatesKeys.map((key) => (
+        <MenuItem key={key} value={key}>
+          {key}
+        </MenuItem>
       ))}
     </Select>
-  )
+  );
 
   function renderComponent() {
     switch (route) {
@@ -147,7 +162,7 @@ function Main() {
         );
       case "/template-editor":
         return (
-          <TemplateEditor 
+          <TemplateEditor
             editorTemplatesState={editorTemplatesState}
             editorTemplatesKeysState={editorTemplatesKeysState}
             editorCurrentTemplateState={editorCurrentTemplateState}
@@ -168,13 +183,19 @@ function Main() {
     }
   }
   function updateFinalText(invokePlace, newTemplateValues) {
-    console.log("invokePlace: ", invokePlace);
-    let values = templateValues;
+    console.log("invokePlace: ", invokePlace, currentTemplate);
+    let values = templateValues[currentTemplate];
+    if (!values) {
+      values = [];
+    }
     if (newTemplateValues) {
       setTemplateValues(newTemplateValues);
-      values = newTemplateValues;
+      values = newTemplateValues[currentTemplate];
     }
     let text = baseText;
+    console.log("V", values);
+    console.log("t V", typeof values);
+    console.log("a V", Array.isArray(values));
     values.forEach((templateValue, index) => {
       if (Array.isArray(templateValue)) {
         let multipleItens = "";
@@ -204,7 +225,11 @@ function Main() {
   }
   return (
     <>
-      <AppBar toggleDrawer={toggleDrawer} templateSelect={templateSelect} editorSelect={editorSelect} />
+      <AppBar
+        toggleDrawer={toggleDrawer}
+        templateSelect={templateSelect}
+        editorSelect={editorSelect}
+      />
       <AppDrawer
         drawerState={drawerState}
         toggleDrawer={toggleDrawer}

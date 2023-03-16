@@ -5,6 +5,8 @@ export default function templatesRepository() {
     saveTemplateFile,
     getTemplateFile,
     moveTemplateFile,
+    saveCurrentTemplate,
+    getCurrentTemplate,
     saveRoute,
     getRoute,
     getForms,
@@ -34,6 +36,12 @@ export default function templatesRepository() {
     const key = `template-file-used-${templateKey}`
     set(key, JSON.stringify(getTemplateFile(templateKey)))
     remove(templateKey)
+  }
+  function saveCurrentTemplate(templateKey) {
+    set('current-template', templateKey)
+  }
+  function getCurrentTemplate() {
+    return get('current-template')
   }
   function saveRoute(route) {
     set('route', route)

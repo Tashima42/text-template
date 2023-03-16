@@ -40,7 +40,7 @@ function App(props) {
             className="text-area"
             value={finalText}
           ></textarea>
-          <Box style={{ maxHeight: "90vh" }} className="box">
+          <Box style={{ maxHeight: "90vh", overflow: "scroll" }} className="box">
             {createForm()}
             <div className="form-buttons">
               <Button
@@ -67,24 +67,16 @@ function App(props) {
   function resetTemplateForm() {
     const confirmReset = confirm("Tem certeza que deseja resetar os campos?");
     if (confirmReset) {
-      templatesRepository.saveTemplateValues(
-        `old-${currentTemplate}`,
-        templateValues
-      );
-      templatesRepository.saveTemplateValues(currentTemplate, []);
+      templatesRepository.saveTemplateValues("old", templateValues);
+      templatesRepository.saveTemplateValues("default", []);
       updateFinalText("resetTemplateForm", []);
     }
   }
   function recoverTemplateForm() {
-    const savedTemplateValues = templatesRepository.getTemplateValues(
-      `old-${currentTemplate}`
-    );
+    const savedTemplateValues = templatesRepository.getTemplateValues("old");
     console.log("saved: ", savedTemplateValues);
     if (savedTemplateValues) {
-      templatesRepository.saveTemplateValues(
-        currentTemplate,
-        savedTemplateValues
-      );
+      templatesRepository.saveTemplateValues("default", savedTemplateValues);
       setTemplateValues(savedTemplateValues);
       updateFinalText("recoverTemplateForm", savedTemplateValues);
     }
@@ -109,7 +101,11 @@ function App(props) {
                   label={label}
                   id={id}
                   key={id}
-                  value={templateValues[id] ?? ""}
+                  value={
+                    templateValues[currentTemplate]
+                      ? templateValues[currentTemplate][id]
+                      : ""
+                  }
                   placeholder={label}
                   onChange={handleFormValuesChange(id)}
                 >
@@ -143,15 +139,23 @@ function App(props) {
                   id={id}
                   key={id}
                   placeholder={label}
-                  value={templateValues[id] ?? []}
+                  value={(() => {
+                    if (templateValues[currentTemplate]) {
+                      if (Array.isArray(templateValues[currentTemplate][id])) {
+                        return templateValues[currentTemplate][id];
+                      }
+                    }
+                    return [];
+                  })()}
                   multiple
                   renderValue={() => ""}
                   onChange={handleFormValuesChange(id)}
                 >
                   {option.values.map((v, i) => {
-                    const checked =
-                      Array.isArray(templateValues[id]) &&
-                      templateValues[id].indexOf(v) > -1;
+                    const checked = templateValues[currentTemplate]
+                      ? Array.isArray(templateValues[currentTemplate][id]) &&
+                        templateValues[currentTemplate][id].indexOf(v) > -1
+                      : false;
                     return (
                       <MenuItem key={i} value={v}>
                         <Checkbox checked={checked} />
@@ -173,7 +177,11 @@ function App(props) {
                 className="text-input"
                 label={label}
                 variant="outlined"
-                value={templateValues[id] ?? ""}
+                value={
+                  templateValues[currentTemplate]
+                    ? templateValues[currentTemplate][id]
+                    : ""
+                }
                 onChange={handleFormValuesChange(id)}
                 sx={{ m: 1, minWidth: 240 }}
               />
@@ -196,34 +204,16 @@ function App(props) {
         target: { value },
       } = event;
 
-      // if (value != null) {
-      //   const multiSplit = value.split("|-|");
-      //   if (multiSplit && multiSplit.length > 1) {
-      //     value = multiSplit[1];
-      //     let templateValueIndex = -1;
-      //     if (Array.isArray(templateValues[id])) {
-      //       templateValueIndex = templateValues[id].indexOf(value);
-      //     }
-      //     if (templateValueIndex > -1) {
-      //       templateValues[id].splice(templateValueIndex, 1);
-      //     } else {
-      //       const multiSubIndex = multiSplit[0];
-      //       if (!templateValues[id]) {
-      //         templateValues[id] = [];
-      //       }
-      //       templateValues[id][multiSubIndex] = value;
-      //     }
-      //   } else {
-      //     templateValues[id] = value;
-      //   }
-      // } else {
-      //   templateValues[id] = value;
-      // }
-
-      templateValues[id] = value;
+      if (templateValues[currentTemplate]) {
+        templateValues[currentTemplate][id] = value;
+      } else {
+        templateValues[currentTemplate] = [];
+        templateValues[currentTemplate][id] = value;
+      }
 
       setTemplateValues(templateValues);
-      templatesRepository.saveTemplateValues(currentTemplate, templateValues);
+      console.log("templateValues: ", templateValues);
+      templatesRepository.saveTemplateValues("default", templateValues);
       updateFinalText("handleFormValuesChange");
     };
   }
