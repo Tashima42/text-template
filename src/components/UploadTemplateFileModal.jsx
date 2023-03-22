@@ -3,7 +3,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Button } from "@mui/material";
-import buildTemplatesRepository from "../repositoy";
+import buildTemplatesRepository from "../repositories/templates";
+import {Template} from "../template.js";
+import errors from "../errors.js"
 
 const templatesRepository = buildTemplatesRepository();
 
@@ -33,6 +35,15 @@ export default function UploadTemplateFileModal(props) {
   }
 
   function useFile() {
+    const template = new Template(file);
+    const templateParseResult = template.parse();
+    if (!templateParseResult.success) {
+      alert(templateParseResult.message);
+      if (templateParseResult.error !== errors.mismatchedConfigVersion) {
+        return;
+      }
+    }
+
     templatesRepository.saveTemplateFile("old", file);
     templatesRepository.saveTemplateFile("default", file);
     handleOpen(false);
