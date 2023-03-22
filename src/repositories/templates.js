@@ -1,4 +1,4 @@
-export default function templatesRepository() {
+export default function buildTemplatesRepository() {
   return Object.freeze({
     saveTemplateValues,
     getTemplateValues,

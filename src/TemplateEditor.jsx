@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 import NewTemplateModal from "./components/NewTemplateModal";
-import buildTemplatesRepository from "./repositoy";
+import buildTemplatesRepository from "./repositories/templates";
 
 const templatesRepository = buildTemplatesRepository();
 

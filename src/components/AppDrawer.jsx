@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { TextSnippet, AccountTree, AddCircle, Save } from "@mui/icons-material";
 import UploadTemplateFileModal from "./UploadTemplateFileModal";
-import buildTemplatesRepository from "../repositoy";
+import buildTemplatesRepository from "../repositories/templates";
 
 const templatesRepository = buildTemplatesRepository();
 

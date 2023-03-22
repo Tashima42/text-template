@@ -11,7 +11,7 @@ import {
   ListItemText,
   Button,
 } from "@mui/material";
-import buildTemplatesRepository from "./repositoy";
+import buildTemplatesRepository from "./repositories/templates";
 
 const templatesRepository = buildTemplatesRepository();
 
