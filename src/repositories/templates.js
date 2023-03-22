@@ -1,24 +1,46 @@
 export default function buildTemplatesRepository() {
   return Object.freeze({
-    saveTemplateValues,
-    getTemplateValues,
-    saveTemplateFile,
-    getTemplateFile,
+    saveTemplateValuesDefault,
+    saveTemplateValuesOld,
+    getTemplateValuesDefault,
+    getTemplateValuesOld,
+    saveTemplateFileDefault,
+    saveTemplateFileOld,
+    getTemplateFileDefault,
+    getTemplateFileOld,
     moveTemplateFile,
-    saveCurrentTemplate,
-    getCurrentTemplate,
+    saveSelectedTemplate,
+    getSelectedTemplate,
     saveRoute,
     getRoute,
     getForms,
     saveForms,
   })
+  function saveTemplateValuesDefault(values) {
+    saveTemplateValues('default', values)
+  }
+  function saveTemplateValuesOld(values) {
+    saveTemplateValues('old', values)
+  }
   function saveTemplateValues(templateKey, values) {
     const key = `template-${templateKey}`
     set(key, JSON.stringify(values))
   }
+  function getTemplateValuesDefault() {
+    return getTemplateValues('default')
+  }
+  function getTemplateValuesOld() {
+    return getTemplateValues('old')
+  }
   function getTemplateValues(templateKey) {
     const key = `template-${templateKey}`
-    return JSON.parse(get(key))
+    return get(key)
+  }
+  function saveTemplateFileDefault(file) {
+    saveTemplateFile('default', file)
+  }
+  function saveTemplateFileOld(file) {
+    saveTemplateFile('old', file)
   }
   function saveTemplateFile(templateKey, file) {
     const key = `template-file-${templateKey}`
@@ -28,20 +50,26 @@ export default function buildTemplatesRepository() {
       set(key, JSON.stringify(file))
     }
   }
+  function getTemplateFileDefault() {
+    return getTemplateFile('default')
+  }
+  function getTemplateFileOld() {
+    return getTemplateFile('old')
+  }
   function getTemplateFile(templateKey) {
     const key = `template-file-${templateKey}`
-    return JSON.parse(get(key))
+    return get(key)
   }
   function moveTemplateFile(templateKey) {
     const key = `template-file-used-${templateKey}`
     set(key, JSON.stringify(getTemplateFile(templateKey)))
     remove(templateKey)
   }
-  function saveCurrentTemplate(templateKey) {
-    set('current-template', templateKey)
+  function saveSelectedTemplate(templateKey) {
+    set('selected-template', templateKey)
   }
-  function getCurrentTemplate() {
-    return get('current-template')
+  function getSelectedTemplate() {
+    return get('selected-template')
   }
   function saveRoute(route) {
     set('route', route)

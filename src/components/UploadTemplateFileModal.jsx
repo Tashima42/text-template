@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Button } from "@mui/material";
 import buildTemplatesRepository from "../repositories/templates";
-import {Template} from "../template.js";
+import {TemplateConfig} from "../template.js";
 import errors from "../errors.js"
 
 const templatesRepository = buildTemplatesRepository();
@@ -35,8 +35,8 @@ export default function UploadTemplateFileModal(props) {
   }
 
   function useFile() {
-    const template = new Template(file);
-    const templateParseResult = template.parse();
+    const templateConfig = new TemplateConfig(file);
+    const templateParseResult = templateConfig.parse();
     if (!templateParseResult.success) {
       alert(templateParseResult.message);
       if (templateParseResult.error !== errors.mismatchedConfigVersion) {
@@ -44,8 +44,8 @@ export default function UploadTemplateFileModal(props) {
       }
     }
 
-    templatesRepository.saveTemplateFile("old", file);
-    templatesRepository.saveTemplateFile("default", file);
+    templatesRepository.saveTemplateFileOld(file);
+    templatesRepository.saveTemplateFileDefault(file);
     handleOpen(false);
     window.location.reload(false);
   }

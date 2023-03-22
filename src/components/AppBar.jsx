@@ -1,9 +1,13 @@
 import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import {
+  Select,
+  MenuItem,
+  Toolbar,
+  AppBar,
+  Box,
+  IconButton,
+} from "@mui/material";
 
 export default function ButtonAppBar(props) {
   return (
@@ -21,11 +25,31 @@ export default function ButtonAppBar(props) {
             <MenuIcon />
           </IconButton>
           <div className="form-select-div">
-            {props.templateSelect}
-            {/* {props.editorSelect} */}
+            <Select
+              labelId="templates-label"
+              label="Templates"
+              id="template-select"
+              onChange={selectTemplate}
+              value={props.selectedTemplate}
+              variant="outlined"
+              sx={{ color: "white", borderColor: "white" }}
+            >
+              {props.templatesKeys.map((key) => (
+                <MenuItem key={key} value={key}>
+                  {key}
+                </MenuItem>
+              ))}
+            </Select>
           </div>
         </Toolbar>
       </AppBar>
     </Box>
   );
+
+  function selectTemplate({ target: { value } }) {
+    if (!value) return;
+    props.setSelectedTemplate(value);
+    templatesRepository.saveSelectedTemplate(value);
+    window.location.reload(false)
+  }
 }

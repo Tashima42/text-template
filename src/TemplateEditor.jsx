@@ -9,7 +9,6 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import NewTemplateModal from "./components/NewTemplateModal";
 import buildTemplatesRepository from "./repositories/templates";
 
 const templatesRepository = buildTemplatesRepository();
@@ -33,7 +32,6 @@ function TemplateEditor(props) {
 
   return (
     <div className="App">
-      <NewTemplateModal openState={newTemplateModalState} handleOpen={newTemplateModalHandle} editorTemplatesState={editorTemplatesState}/>
       {(editorTemplates != null && editorTemplates[editorCurrentTemplate] != null) 
       ? (
         <div className="text-editor">
