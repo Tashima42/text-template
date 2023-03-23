@@ -62,8 +62,9 @@ function Main() {
     }
 
     if (!selectedTemplate) {
-      templatesRepository.saveSelectedTemplate(templatesKeys[0]);
-      setSelectedTemplate(templatesKeys[0]);
+      const firstTemplateKey = templateConfig.getTemplatesKeys()[0];
+      templatesRepository.saveSelectedTemplate(firstTemplateKey);
+      setSelectedTemplate(firstTemplateKey);
     }
 
     if (!currentTemplate) {
@@ -71,21 +72,28 @@ function Main() {
     }
 
     if (!templateValues) {
-      let storageValues;
       try {
-        storageValues = JSON.parse(
-          templatesRepository.getTemplateFileDefault()
+        const storageValues = JSON.parse(
+          templatesRepository.getTemplateValuesDefault()
         );
+        console.log("storageValues", storageValues);
         setTemplateValues(storageValues);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
 
+  }, [selectedTemplate, route]);
+
+  React.useEffect(() => {
+    if (!currentTemplate) {
+      return;
+    }
     if (templateValues) {
+      console.log("useEffect", templateValues);
       setFinalText(currentTemplate.replaceTextVariables(templateValues));
     }
-  }, [selectedTemplate, route]);
+  }, [currentTemplate]);
 
   return (
     <>

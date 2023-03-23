@@ -23,7 +23,7 @@ export default function buildTemplatesRepository() {
     saveTemplateValues('old', values)
   }
   function saveTemplateValues(templateKey, values) {
-    const key = `template-${templateKey}`
+    const key = `template-values-${templateKey}`
     set(key, JSON.stringify(values))
   }
   function getTemplateValuesDefault() {
@@ -33,7 +33,7 @@ export default function buildTemplatesRepository() {
     return getTemplateValues('old')
   }
   function getTemplateValues(templateKey) {
-    const key = `template-${templateKey}`
+    const key = `template-values-${templateKey}`
     return get(key)
   }
   function saveTemplateFileDefault(file) {

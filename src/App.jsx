@@ -65,11 +65,15 @@ function App(props) {
     if (savedTemplateValues) {
       templatesRepository.saveTemplateValuesDefault(savedTemplateValues);
       setTemplateValues(savedTemplateValues);
+      console.log("TemplateValuesRecover", templateValues);
       setFinalText(currentTemplate.replaceTextVariables(templateValues));
     }
   }
 
   function createForm() {
+    if (!currentTemplate) {
+      return <div>Loading...</div>;
+    }
     return (
       <form>
         <div className="template-form">
@@ -90,7 +94,11 @@ function App(props) {
                       label={label}
                       id={id}
                       key={id}
-                      value={templateValues[id] ? templateValues[id] : ""}
+                      value={
+                        templateValues && templateValues[id]
+                          ? templateValues[id]
+                          : ""
+                      }
                       placeholder={label}
                       onChange={handleFormValuesChange(id)}
                     >
@@ -124,11 +132,13 @@ function App(props) {
                       id={id}
                       key={id}
                       placeholder={label}
-                      value={(() => {
+                      value={
+                        templateValues &&
+                        templateValues[id] &&
                         Array.isArray(templateValues[id])
                           ? templateValues[id]
-                          : [];
-                      })()}
+                          : []
+                      }
                       multiple
                       renderValue={() => ""}
                       onChange={handleFormValuesChange(id)}
@@ -138,6 +148,7 @@ function App(props) {
                           <MenuItem key={i} value={v}>
                             <Checkbox
                               checked={
+                                templateValues &&
                                 Array.isArray(templateValues[id]) &&
                                 templateValues[id].indexOf(v) > -1
                                   ? true
@@ -164,7 +175,11 @@ function App(props) {
                     className="text-input"
                     label={label}
                     variant="outlined"
-                    value={templateValues[id]}
+                    value={
+                      templateValues && templateValues[id]
+                        ? templateValues[id]
+                        : ""
+                    }
                     onChange={handleFormValuesChange(id)}
                     sx={{ m: 1, minWidth: 240 }}
                   />
@@ -183,12 +198,16 @@ function App(props) {
       let {
         target: { value },
       } = event;
+      let copyTemplateValues = { ...templateValues };
+      copyTemplateValues[id] = value;
 
-      templateValues[id] = value;
-
-      setTemplateValues(templateValues);
-      templatesRepository.saveTemplateValuesDefault(templateValues);
-      setFinalText(currentTemplate.replaceTextVariables(templateValues));
+      setTemplateValues(copyTemplateValues);
+      templatesRepository.saveTemplateValuesDefault(copyTemplateValues);
+      console.log("handleFormValuesChange", copyTemplateValues);
+      const updatedFinalText =
+        currentTemplate.replaceTextVariables(copyTemplateValues);
+      console.log("updatedFinalText", updatedFinalText);
+      setFinalText(updatedFinalText);
     };
   }
 }

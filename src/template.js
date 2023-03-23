@@ -31,19 +31,22 @@ export class Template {
    */
   replaceTextVariables(values) {
     let text = this.getBaseText()
-    if (values.length == 0) {
+    if (!values || Object.keys(values).length === 0) {
       return text
     }
-    if (values) this.values = values
 
-
-    this.values.forEach((value, index) => {
+    console.log("options", this.options)
+    console.log("values", values)
+    this.options.forEach((option) => {
+      let value = values[option.id]
+      if (!value) return
+      console.log("value", value)
       if (Array.isArray(value)) {
         const multiValues = filterInvalidValues(value)
         value = numberSelectedItens(multiValues)
       }
-      value = replaceEmptyValueWithIndex(value, index) 
-      text = text.replace(`{{${index}}}`, value)
+      value = replaceEmptyValueWithIndex(value, option.id)
+      text = text.replace(`{{${option.id}}}`, value)
     })
     return text
 
@@ -57,7 +60,8 @@ export class Template {
     function numberSelectedItens(multiValues) {
       let text = ""
       multiValues.forEach((item, i) => {
-        text = text + `${i+1} ${item}`
+        if (i !== 0) text = text + " "
+        text = text + `${i + 1}) ${item}`
       })
       return text
     }

@@ -5,6 +5,7 @@
       "baseText": "{{1}} da CAIXA, {{2}} em {{3}}. Desligou-se em {{4}}, por meio de adesão ao PADV/PAA. Ocupou no período não prescrito o cargo comissionado de/a função gratificada de {{5}}. Ajuizou ação trabalhista em {{6}}, onde pleiteou a condenação da CAIXA, em síntese, nos seguintes itens: {{7}}",
       "options": [
         {
+          "id": 1,
           "type": "select",
           "label": "Empregado ou Empregada",
           "values": [
@@ -13,6 +14,7 @@
           ]
         },
         {
+          "id": 2,
           "type": "select",
           "label": "Empregado ou Empregada",
           "values": [
@@ -21,14 +23,17 @@
           ]
         },
         {
+          "id": 3,
           "label": "Data de admissão",
           "type": "input"
         },
         {
+          "id": 4,
           "label": "Data de desligamento",
           "type": "input"
         },
         {
+          "id": 5,
           "label": "Cargo",
           "type": "select",
           "values": [
@@ -39,10 +44,12 @@
           ]
         },
         {
+          "id": 6,
           "label": "Data em que ajuizou",
           "type": "input"
         },
         {
+          "id": 7,
           "label": "Pedidos",
           "type": "multi-select",
           "values": [
@@ -58,6 +65,7 @@
       "baseText": "{{1}} TESTE {{2}} em {{3}}. Desligou-se em {{4}}, por meio de adesão ao PADV/PAA. Ocupou no período não prescrito o cargo comissionado de/a função gratificada de {{5}}. Ajuizou ação trabalhista em {{6}}, onde pleiteou a condenação da CAIXA, em síntese, nos seguintes itens: {{7}}",
       "options": [
         {
+          "id": 1,
           "type": "select",
           "label": "ASDF Empregado ou Empregada",
           "values": [
@@ -66,6 +74,7 @@
           ]
         },
         {
+          "id": 2,
           "type": "select",
           "label": "2 - Empregado ou Emp",
           "values": [
@@ -74,14 +83,17 @@
           ]
         },
         {
+          "id": 3,
           "label": "3333Data de Asd",
           "type": "input"
         },
         {
+          "id": 4,
           "label": "5555444ljfd Data de desligamento",
           "type": "input"
         },
         {
+          "id": 5,
           "label": "9  argo",
           "type": "select",
           "values": [
@@ -92,10 +104,12 @@
           ]
         },
         {
+          "id": 6,
           "label": "kljasdfo;as",
           "type": "input"
         },
         {
+          "id": 7,
           "label": "Perskd",
           "type": "multi-select",
           "values": [
