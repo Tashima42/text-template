@@ -15,6 +15,9 @@ import { TemplateConfig } from "./template.js";
 const templatesRepository = buildTemplatesRepository();
 
 function Main() {
+  const uploadModalState = React.useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = uploadModalState;
+
   const drawerState = React.useState(false);
   const [_, setDrawer] = drawerState;
   const routeState = React.useState(templatesRepository.getRoute() ?? "/");
@@ -105,6 +108,7 @@ function Main() {
       />
       <AppDrawer
         drawerState={drawerState}
+        uploadModalState={uploadModalState}
         toggleDrawer={toggleDrawer}
         routeState={routeState}
       />
@@ -123,8 +127,8 @@ function Main() {
             templateValuesState={templateValuesState}
           />
         ) : (
-          <div>
-            <Button>Fazer upload</Button>
+          <div className="upload-button">
+            <Button variant="contained" onClick={() => setUploadModalOpen(true)}>Fazer upload de configuração</Button>
           </div>
         );
     }

@@ -24,7 +24,7 @@ export default function ButtonAppBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <div className="form-select-div">
+          {/* <div className="form-select-div">
             <Select
               labelId="templates-label"
               label="Templates"
@@ -40,7 +40,7 @@ export default function ButtonAppBar(props) {
                 </MenuItem>
               ))}
             </Select>
-          </div>
+          </div> */}
         </Toolbar>
       </AppBar>
     </Box>

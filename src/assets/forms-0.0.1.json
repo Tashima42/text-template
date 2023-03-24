@@ -1,0 +1,122 @@
+{
+  "PEDIDOS": {
+    "baseText": "{{1}} da CAIXA, {{2}} em {{3}}. Desligou-se em {{4}}, por meio de adesão ao PADV/PAA. Ocupou no período não prescrito o cargo comissionado de/a função gratificada de {{5}}. Ajuizou ação trabalhista em {{6}}, onde pleiteou a condenação da CAIXA, em síntese, nos seguintes itens: {{7}}",
+    "options": [
+      {
+        "id": 1,
+        "type": "select",
+        "label": "Empregado ou Empregada",
+        "values": [
+          "Ex-empregado",
+          "Ex-empregada"
+        ]
+      },
+      {
+        "id": 2,
+        "type": "select",
+        "label": "Empregado ou Empregada",
+        "values": [
+          "admitido",
+          "admitida"
+        ]
+      },
+      {
+        "id": 3,
+        "label": "Data de admissão",
+        "type": "input"
+      },
+      {
+        "id": 4,
+        "label": "Data de desligamento",
+        "type": "input"
+      },
+      {
+        "id": 5,
+        "label": "Cargo",
+        "type": "select",
+        "values": [
+          "gerente",
+          "caixa",
+          "gerente geral",
+          "supervisor de atendimento"
+        ]
+      },
+      {
+        "id": 6,
+        "label": "Data em que ajuizou",
+        "type": "input"
+      },
+      {
+        "id": 7,
+        "label": "Pedidos",
+        "type": "multi-select",
+        "values": [
+          "horas extras, consideradas as excedentes à sexta hora diária e trigésima semanal, durante todo o período contratual, com divisor 150, adicional 50% e 100%, com reflexos;",
+          "que a Justiça do Trabalho é absolutamente incompetente para processar e julgar assuntos que tratem de previdência privada, como é o caso da FUNCEF;",
+          "intervalo do Art. 384 da CLT;",
+          "uma hora extra pelo intervalo intrajornada não concedido corretamento;"
+        ]
+      }
+    ]
+  },
+  "PEDIDOS-2": {
+    "baseText": "{{1}} TESTE {{2}} em {{3}}. Desligou-se em {{4}}, por meio de adesão ao PADV/PAA. Ocupou no período não prescrito o cargo comissionado de/a função gratificada de {{5}}. Ajuizou ação trabalhista em {{6}}, onde pleiteou a condenação da CAIXA, em síntese, nos seguintes itens: {{7}}",
+    "options": [
+      {
+        "id": 1,
+        "type": "select",
+        "label": "ASDF Empregado ou Empregada",
+        "values": [
+          "test",
+          "test 2"
+        ]
+      },
+      {
+        "id": 2,
+        "type": "select",
+        "label": "2 - Empregado ou Emp",
+        "values": [
+          "oioio",
+          "aiaiai"
+        ]
+      },
+      {
+        "id": 3,
+        "label": "3333Data de Asd",
+        "type": "input"
+      },
+      {
+        "id": 4,
+        "label": "5555444ljfd Data de desligamento",
+        "type": "input"
+      },
+      {
+        "id": 5,
+        "label": "9  argo",
+        "type": "select",
+        "values": [
+          "12kl4jfd",
+          "ajfklds",
+          "8230u adsfkjl",
+          "zjsdksdkfl"
+        ]
+      },
+      {
+        "id": 6,
+        "label": "kljasdfo;as",
+        "type": "input"
+      },
+      {
+        "id": 7,
+        "label": "Perskd",
+        "type": "multi-select",
+        "values": [
+          "aaaaaaaaa",
+          "bbbbbbbbb",
+          "cccccccc",
+          "ddddddddd"
+        ]
+      }
+    ]
+  }
+}
