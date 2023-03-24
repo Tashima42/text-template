@@ -7,21 +7,20 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { TextSnippet, AccountTree, AddCircle, Save } from "@mui/icons-material";
+import { TextSnippet, AddCircle, Save } from "@mui/icons-material";
 import UploadTemplateFileModal from "./UploadTemplateFileModal";
 import buildTemplatesRepository from "../repositories/templates";
 
 const templatesRepository = buildTemplatesRepository();
 
 export default function AppDrawer(props) {
-  const uploadModalState = React.useState(false);
+  const [_, setUploadModalOpen] = props.uploadModalState
   const [route, setRoute] = props.routeState;
-  const [_, setOpen] = uploadModalState;
   const [drawer] = props.drawerState;
   const toggleDrawer = props.toggleDrawer;
 
   function handleOpen(openState) {
-    setOpen(openState);
+    setUploadModalOpen(openState);
   }
 
   function handleTemplateEditorRoute() {
@@ -46,7 +45,7 @@ export default function AppDrawer(props) {
   return (
     <React.Fragment>
       <UploadTemplateFileModal
-        openState={uploadModalState}
+        openState={props.uploadModalState}
         handleOpen={handleOpen}
       />
       <Drawer open={drawer} onClose={toggleDrawer(false)}>

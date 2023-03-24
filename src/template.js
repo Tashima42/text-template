@@ -105,6 +105,9 @@ export class TemplateConfig {
       return { success: false, message: 'Não foi possível ler o arquivo de configuração.', error: errors.failedToJSONParse }
     }
     // Verify the config file version
+    if (!this.config.version) {
+      return { success: false, message: `Versão da configuração não encontrada, a versão esperada era '${consts.templateConfigVersion}', essa configuração pode não funcionar.`, error: errors.mismatchedConfigVersion }
+    }
     if (this.config.version != consts.templateConfigVersion) {
       return { success: false, message: `Versão da configuração é '${this.config.version}', a versão esperada era '${consts.templateConfigVersion}', essa configuração pode não funcionar.`, error: errors.mismatchedConfigVersion }
     }
