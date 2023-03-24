@@ -32,7 +32,7 @@ export default function AppDrawer(props) {
   }
 
   async function handleDownload() {
-    const json = JSON.stringify(templatesRepository.getTemplateFile("default"));
+    const json = JSON.stringify(templatesRepository.getTemplateFileDefault());
     const blob = new Blob([json], { type: "application/json" });
     const href = await URL.createObjectURL(blob);
     const link = document.createElement("a");
